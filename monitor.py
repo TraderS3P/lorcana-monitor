@@ -19,12 +19,12 @@ STORES = [
     {
         "name": "401 Games",
         "domain": "https://store.401games.ca",
-        "products_json": "https://store.401games.ca/collections/disney-lorcana-trading-card-game/products.json?limit=250",
+        "products_json": "https://store.401games.ca/collections/disney-lorcana-sealed-product/products.json?limit=250",
     },
     {
         "name": "Face to Face Games",
         "domain": "https://facetofacegames.com",
-        "products_json": "https://facetofacegames.com/en-us/collections/lorcana/products.json?limit=250",
+        "products_json": "https://facetofacegames.com/en-us/collections/lorcana-sealed/products.json?limit=250",
     },
     {
         "name": "Hobbiesville",
@@ -37,6 +37,20 @@ STORES = [
         "products_json": "https://remicardtrader.ca/en/collections/disney-lorcana/products.json?limit=250",
     },
 ]
+
+SEALED_KEYWORDS = [
+    "booster box", "booster pack", "booster bundle", "boosters",
+    "starter deck", "challenge deck", "deck box",
+    "gift set", "gift box", "collection starter", "collector's set", "collector set",
+    "trove", "bundle", "blister", "tin", "display", "case",
+    "two-player", "gateway", "quest", "fat pack", "value pack",
+]
+
+
+def is_sealed_product(title: str) -> bool:
+    title_lower = title.lower()
+    return any(keyword in title_lower for keyword in SEALED_KEYWORDS)
+
 
 NTFY_TOPIC = os.environ.get("NTFY_TOPIC")
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; LorcanaRestockMonitor/1.0)"}
@@ -83,9 +97,12 @@ def check_store(store: dict, state: dict) -> dict:
 
     new_items = {}
     for product in products:
+        title = product.get("title", "Unknown item")
+        if not is_sealed_product(title):
+            continue
+
         handle = product.get("handle", "")
         product_url = f"{store['domain']}/products/{handle}"
-        title = product.get("title", "Unknown item")
 
         for variant in product.get("variants", []):
             key = f"{store['name']}::{title}::{variant.get('title', 'default')}"
