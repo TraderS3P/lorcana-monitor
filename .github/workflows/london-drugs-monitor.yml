@@ -1,0 +1,47 @@
+name: London Drugs Lorcana Monitor
+
+on:
+  schedule:
+    - cron: "0,30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  check-london-drugs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright requests
+          playwright install --with-deps chromium
+
+      - name: Run London Drugs monitor
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python london_drugs_monitor.py
+
+      - name: Upload screenshots for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: london-drugs-screenshots
+          path: screenshots/
+          retention-days: 3
+
+      - name: Save updated stock state
+        run: |
+          git config user.name "lorcana-monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add london_drugs_state.json
+          git diff --staged --quiet || git commit -m "Update London Drugs stock state"
+          git push
