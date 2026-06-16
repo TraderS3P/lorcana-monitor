@@ -4,6 +4,17 @@ Lorcana Restock Monitor
 Polls Shopify-based Canadian game store collections for Disney Lorcana
 stock, and sends a push notification (via ntfy.sh) the moment something
 goes from "out of stock" to "in stock".
+
+This watches each store's PUBLISHED ONLINE stock. Many local game stores
+explicitly say their website stock does not always match what's on the
+physical shelf -- this is the best automatable signal available short of
+someone calling the shop.
+
+Add more stores by adding an entry to STORES below. To find a store's feed:
+  1. Find their Lorcana collection page, e.g. https://example.ca/collections/lorcana
+  2. Append /products.json, e.g. https://example.ca/collections/lorcana/products.json
+  3. Open it in a browser -- if you see JSON with a "products" list, it works.
+(Only works for stores running Shopify. Not all LGS do.)
 """
 
 import json
@@ -19,11 +30,13 @@ STORES = [
     {
         "name": "401 Games",
         "domain": "https://store.401games.ca",
+        # Switched to the sealed-only collection (the general one mixes in singles).
         "products_json": "https://store.401games.ca/collections/disney-lorcana-sealed-product/products.json?limit=250",
     },
     {
         "name": "Face to Face Games",
         "domain": "https://facetofacegames.com",
+        # Switched to the sealed-only collection.
         "products_json": "https://facetofacegames.com/en-us/collections/lorcana-sealed/products.json?limit=250",
     },
     {
@@ -36,8 +49,30 @@ STORES = [
         "domain": "https://remicardtrader.ca",
         "products_json": "https://remicardtrader.ca/en/collections/disney-lorcana/products.json?limit=250",
     },
+    {
+        "name": "Draw For Turn Games",
+        "domain": "https://drawforturn.ca",
+        "products_json": "https://drawforturn.ca/collections/lorcana-products/products.json?limit=250",
+    },
+    {
+        "name": "House of Cards",
+        "domain": "https://houseofcards.ca",
+        "products_json": "https://houseofcards.ca/collections/disney-lorcana-sealed-product/products.json?limit=250",
+    },
+    {
+        "name": "UBE Card",
+        "domain": "https://ubecard.com",
+        # UBE has no dedicated Lorcana collection, so this tracks one
+        # specific product directly. Add more the same way if you find
+        # other UBE Lorcana product URLs (use .../products/HANDLE.json).
+        "products_json": "https://ubecard.com/products/disney-lorcana-set-8-reign-of-jafar-booster.json",
+    },
+    # Add more Canadian Shopify-based stores here, same shape as above.
 ]
 
+# Only notify for products that look like sealed product (boxes, packs, sets,
+# bundles, etc). This is a safety net even for the "sealed-only" collections
+# above, in case a store's feed still mixes in singles, accessories, etc.
 SEALED_KEYWORDS = [
     "booster box", "booster pack", "booster bundle", "boosters",
     "starter deck", "challenge deck", "deck box",
@@ -87,10 +122,20 @@ def send_notification(title: str, message: str, url: str) -> None:
 
 
 def check_store(store: dict, state: dict) -> dict:
+    """Returns the updated availability state for this store's items.
+    Handles both a collection feed (.../collections/x/products.json,
+    shaped as {"products": [...]}) and a single product feed
+    (.../products/x.json, shaped as {"product": {...}})."""
     try:
         resp = requests.get(store["products_json"], headers=HEADERS, timeout=20)
         resp.raise_for_status()
-        products = resp.json().get("products", [])
+        data = resp.json()
+        if "products" in data:
+            products = data["products"]
+        elif "product" in data:
+            products = [data["product"]]
+        else:
+            products = []
     except (requests.RequestException, ValueError) as e:
         print(f"[{store['name']}] fetch failed: {e}", file=sys.stderr)
         return {}
