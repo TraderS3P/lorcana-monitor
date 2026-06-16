@@ -224,7 +224,7 @@ async def set_store(page, postal_code: str, label: str) -> bool:
 
 async def check_product_at_store(page, product: dict, store: dict, state: dict) -> dict:
     key = f"{store['name']}::{product['name']}"
-    safe_name = key.replace("::", "__").replace("/", "-").replace(" ", "_").replace("'", "")
+    safe_name = key.replace("::", "__").replace("/", "-").replace(" ", "_").replace("'", "").replace(":", "")
     screenshot_path = SCREENSHOT_DIR / f"{safe_name}.png"
 
     try:
