@@ -321,7 +321,7 @@
   "Remi Card Trader::Disney Lorcana - Set 11 - Winterspell Booster Box::Caisse de 4 bo\u00eetes": false,
   "Remi Card Trader::Disney Lorcana - Set 10 - Whispers In The Well Booster Box::Pack of 12 cards": true,
   "Remi Card Trader::Disney Lorcana - Set 10 - Whispers In The Well Booster Box::Box of 24 packs": true,
-  "Remi Card Trader::Disney Lorcana - Set 10 - Whispers In The Well Booster Box::Caisse de 4 bo\u00eetes": true,
+  "Remi Card Trader::Disney Lorcana - Set 10 - Whispers In The Well Booster Box::Caisse de 4 bo\u00eetes": false,
   "Remi Card Trader::Disney Lorcana - Set 12 - Wilds Unknown Booster Box::Pack of 12 cards": false,
   "Remi Card Trader::Disney Lorcana - Set 12 - Wilds Unknown Booster Box::Box of 24 packs": false,
   "Remi Card Trader::Disney Lorcana - Set 12 - Wilds Unknown Booster Box::Case of 4 boxes": false,
@@ -436,7 +436,9 @@
   "Draw For Turn Games::Disney Lorcana Rise of The Floodborn Booster Box::Default Title": false,
   "Draw For Turn Games::Disney Lorcana The First Chapter Booster Box::Default Title": false,
   "House of Cards::Disney Lorcana: Scrooge McDuck | Gift Set::Default Title": true,
+  "House of Cards::Disney Lorcana: Winterspell | Booster Pack::Default Title": true,
   "House of Cards::Disney Lorcana: Reign of Jafar | Illumineer's Quest - Palace Heist::Default Title": true,
+  "House of Cards::Disney Lorcana: Archazia's Island | Booster Pack::Default Title": true,
   "House of Cards::Disney Lorcana: Archazia's Island | Illumineer's Trove::Default Title": true,
   "House of Cards::Disney Lorcana: Archazia's Island | Booster Box::Default Title": true,
   "House of Cards::Disney Lorcana: Azurite Sea | Booster Pack::Default Title": true,
@@ -448,6 +450,7 @@
   "House of Cards::Disney Lorcana: Into the Inklands | Gift Set::Default Title": true,
   "House of Cards::Disney Lorcana: Into the Inklands | Booster Pack::Default Title": true,
   "House of Cards::Disney Lorcana: Rise of the Floodborn | Starter Deck - Amber & Sapphire::Default Title": true,
+  "House of Cards::Disney Lorcana: Rise of the Floodborn | Booster Pack::Default Title": true,
   "House of Cards::Disney Lorcana: Rise of the Floodborn | Booster Box::Default Title": true,
   "UBE Card::DISNEY LORCANA SET 8 REIGN OF JAFAR BOOSTER BOX::Default Title": false
 }
