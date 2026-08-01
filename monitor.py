@@ -4,17 +4,6 @@ Lorcana Restock Monitor
 Polls Shopify-based Canadian game store collections for Disney Lorcana
 stock, and sends a push notification (via ntfy.sh) the moment something
 goes from "out of stock" to "in stock".
-
-This watches each store's PUBLISHED ONLINE stock. Many local game stores
-explicitly say their website stock does not always match what's on the
-physical shelf -- this is the best automatable signal available short of
-someone calling the shop.
-
-Add more stores by adding an entry to STORES below. To find a store's feed:
-  1. Find their Lorcana collection page, e.g. https://example.ca/collections/lorcana
-  2. Append /products.json, e.g. https://example.ca/collections/lorcana/products.json
-  3. Open it in a browser -- if you see JSON with a "products" list, it works.
-(Only works for stores running Shopify. Not all LGS do.)
 """
 
 import json
@@ -72,9 +61,15 @@ STORES = [
         "domain": "https://ubecard.com",
         "products_json": "https://ubecard.com/products/disney-lorcana-set-8-reign-of-jafar-booster.json",
     },
-    # Add more Canadian Shopify-based stores here, same shape as above.
 ]
 
+SEALED_KEYWORDS = [
+    "booster box", "booster pack", "booster bundle", "boosters",
+    "starter deck", "challenge deck", "trial deck", "deck box",
+    "gift set", "gift box", "collection starter", "collector's set", "collector set",
+    "trove", "bundle", "blister", "tin", "display", "case",
+    "two-player", "gateway", "quest", "fat pack", "value pack",
+]
 
 
 def is_sealed_product(title: str) -> bool:
@@ -117,63 +112,8 @@ def send_notification(title: str, message: str, url: str) -> None:
 
 
 def check_store(store: dict, state: dict) -> dict:
-    """Returns the updated availability state for this store's items.
-    Handles both a collection feed (.../collections/x/products.json,
-    shaped as {"products": [...]}) and a single product feed
-    (.../products/x.json, shaped as {"product": {...}})."""
+    """Handles both collection feeds and single product feeds."""
     try:
         resp = requests.get(store["products_json"], headers=HEADERS, timeout=20)
         resp.raise_for_status()
-        data = resp.json()
-        if "products" in data:
-            products = data["products"]
-        elif "product" in data:
-            products = [data["product"]]
-        else:
-            products = []
-    except (requests.RequestException, ValueError) as e:
-        print(f"[{store['name']}] fetch failed: {e}", file=sys.stderr)
-        return {}
-
-    new_items = {}
-    for product in products:
-        title = product.get("title", "Unknown item")
-        if not is_sealed_product(title):
-            continue
-
-        handle = product.get("handle", "")
-        product_url = f"{store['domain']}/products/{handle}"
-
-        for variant in product.get("variants", []):
-            key = f"{store['name']}::{title}::{variant.get('title', 'default')}"
-            available = bool(variant.get("available"))
-            new_items[key] = available
-
-            was_available = state.get(key)
-            if available and not was_available:
-                variant_label = variant.get("title", "")
-                label = title if variant_label in ("Default Title", "") else f"{title} ({variant_label})"
-                send_notification(
-                    title=f"Lorcana restock: {store['name']}",
-                    message=f"{label} is back in stock!",
-                    url=product_url,
-                )
-                print(f"RESTOCK: [{store['name']}] {label} -> {product_url}")
-
-    return new_items
-
-
-def main() -> None:
-    state = load_state()
-    new_state = {}
-
-    for store in STORES:
-        store_items = check_store(store, state)
-        new_state.update(store_items)
-
-    save_state(new_state)
-    print(f"Checked {len(STORES)} store(s), tracking {len(new_state)} item variants.")
-
-
-if __name__ == "__main__":
-    main()
+        data
