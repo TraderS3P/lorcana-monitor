@@ -1,9 +1,16 @@
 """
-Lorcana Restock Monitor
------------------------
-Polls Shopify-based Canadian game store collections for Disney Lorcana
-stock, and sends a push notification (via ntfy.sh) the moment something
-goes from "out of stock" to "in stock".
+Restock Monitor
+---------------
+Polls Shopify-based Canadian game store collections for Disney Lorcana,
+Palworld TCG, and Riftbound TCG sealed product, and sends a push
+notification (via ntfy.sh) the moment something goes from out of stock
+to in stock.
+
+Add more stores by adding an entry to STORES below. To find a store feed:
+  1. Find their collection page, e.g. https://example.ca/collections/lorcana
+  2. Append /products.json
+  3. Open it in a browser -- if you see JSON with a products list, it works.
+Only works for stores running Shopify.
 """
 
 import json
@@ -17,7 +24,7 @@ STATE_FILE = Path(__file__).parent / "state.json"
 
 STORES = [
     {
-        "name": "401 Games",
+        "name": "401 Games (Lorcana)",
         "domain": "https://store.401games.ca",
         "products_json": "https://store.401games.ca/collections/disney-lorcana-sealed-product/products.json?limit=250",
     },
@@ -27,12 +34,17 @@ STORES = [
         "products_json": "https://store.401games.ca/collections/all-palworld-card-game/products.json?limit=250",
     },
     {
+        "name": "401 Games (Riftbound)",
+        "domain": "https://store.401games.ca",
+        "products_json": "https://store.401games.ca/collections/all-riftbound-league-of-legends-tcg/products.json?limit=250",
+    },
+    {
         "name": "Face to Face Games",
         "domain": "https://facetofacegames.com",
         "products_json": "https://facetofacegames.com/en-us/collections/lorcana-sealed/products.json?limit=250",
     },
     {
-        "name": "Hobbiesville",
+        "name": "Hobbiesville (Lorcana)",
         "domain": "https://hobbiesville.com",
         "products_json": "https://hobbiesville.com/collections/disney-lorcana/products.json?limit=250",
     },
@@ -40,6 +52,11 @@ STORES = [
         "name": "Hobbiesville (Palworld)",
         "domain": "https://hobbiesville.com",
         "products_json": "https://hobbiesville.com/collections/palworld/products.json?limit=250",
+    },
+    {
+        "name": "Hobbiesville (Riftbound)",
+        "domain": "https://hobbiesville.com",
+        "products_json": "https://hobbiesville.com/collections/riftbound-league-of-legends-tcg/products.json?limit=250",
     },
     {
         "name": "Remi Card Trader",
@@ -61,14 +78,31 @@ STORES = [
         "domain": "https://ubecard.com",
         "products_json": "https://ubecard.com/products/disney-lorcana-set-8-reign-of-jafar-booster.json",
     },
+    {
+        "name": "Screen Free Games (Lorcana)",
+        "domain": "https://screenfreegames.com",
+        "products_json": "https://screenfreegames.com/collections/lorcana-boosters/products.json?limit=250",
+    },
+    {
+        "name": "Infinity Cards (Lorcana)",
+        "domain": "https://infinitycards.ca",
+        "products_json": "https://infinitycards.ca/collections/lorcana-sealed-products/products.json?limit=250",
+    },
+    {
+        "name": "Infinity Cards (Riftbound)",
+        "domain": "https://infinitycards.ca",
+        "products_json": "https://infinitycards.ca/collections/riftbound-sealed/products.json?limit=250",
+    },
 ]
 
 SEALED_KEYWORDS = [
     "booster box", "booster pack", "booster bundle", "boosters",
     "starter deck", "challenge deck", "trial deck", "deck box",
-    "gift set", "gift box", "collection starter", "collector's set", "collector set",
-    "trove", "bundle", "blister", "tin", "display", "case",
-    "two-player", "gateway", "quest", "fat pack", "value pack",
+    "gift set", "gift box", "collection starter", "starter set",
+    "collector's set", "collector set", "trove", "bundle", "blister",
+    "tin", "display", "case", "two-player", "gateway", "quest",
+    "fat pack", "value pack", "proving grounds", "showdown deck",
+    "champion deck",
 ]
 
 
@@ -78,7 +112,7 @@ def is_sealed_product(title: str) -> bool:
 
 
 NTFY_TOPIC = os.environ.get("NTFY_TOPIC")
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; LorcanaRestockMonitor/1.0)"}
+HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; RestockMonitor/1.0)"}
 
 
 def load_state() -> dict:
