@@ -116,4 +116,56 @@ def check_store(store: dict, state: dict) -> dict:
     try:
         resp = requests.get(store["products_json"], headers=HEADERS, timeout=20)
         resp.raise_for_status()
-        data
+        data = resp.json()
+        if "products" in data:
+            products = data["products"]
+        elif "product" in data:
+            products = [data["product"]]
+        else:
+            products = []
+    except (requests.RequestException, ValueError) as e:
+        print(f"[{store['name']}] fetch failed: {e}", file=sys.stderr)
+        return {}
+
+    new_items = {}
+    for product in products:
+        title = product.get("title", "Unknown item")
+        if not is_sealed_product(title):
+            continue
+
+        handle = product.get("handle", "")
+        product_url = f"{store['domain']}/products/{handle}"
+
+        for variant in product.get("variants", []):
+            key = f"{store['name']}::{title}::{variant.get('title', 'default')}"
+            available = bool(variant.get("available"))
+            new_items[key] = available
+
+            was_available = state.get(key)
+            if available and not was_available:
+                variant_label = variant.get("title", "")
+                label = title if variant_label in ("Default Title", "") else f"{title} ({variant_label})"
+                send_notification(
+                    title=f"Restock: {store['name']}",
+                    message=f"{label} is back in stock!",
+                    url=product_url,
+                )
+                print(f"RESTOCK: [{store['name']}] {label} -> {product_url}")
+
+    return new_items
+
+
+def main() -> None:
+    state = load_state()
+    new_state = {}
+
+    for store in STORES:
+        store_items = check_store(store, state)
+        new_state.update(store_items)
+
+    save_state(new_state)
+    print(f"Checked {len(STORES)} store(s), tracking {len(new_state)} item variants.")
+
+
+if __name__ == "__main__":
+    main()
