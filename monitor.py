@@ -30,19 +30,27 @@ STORES = [
     {
         "name": "401 Games",
         "domain": "https://store.401games.ca",
-        # Switched to the sealed-only collection (the general one mixes in singles).
         "products_json": "https://store.401games.ca/collections/disney-lorcana-sealed-product/products.json?limit=250",
+    },
+    {
+        "name": "401 Games (Palworld)",
+        "domain": "https://store.401games.ca",
+        "products_json": "https://store.401games.ca/collections/all-palworld-card-game/products.json?limit=250",
     },
     {
         "name": "Face to Face Games",
         "domain": "https://facetofacegames.com",
-        # Switched to the sealed-only collection.
         "products_json": "https://facetofacegames.com/en-us/collections/lorcana-sealed/products.json?limit=250",
     },
     {
         "name": "Hobbiesville",
         "domain": "https://hobbiesville.com",
         "products_json": "https://hobbiesville.com/collections/disney-lorcana/products.json?limit=250",
+    },
+    {
+        "name": "Hobbiesville (Palworld)",
+        "domain": "https://hobbiesville.com",
+        "products_json": "https://hobbiesville.com/collections/palworld/products.json?limit=250",
     },
     {
         "name": "Remi Card Trader",
@@ -62,24 +70,11 @@ STORES = [
     {
         "name": "UBE Card",
         "domain": "https://ubecard.com",
-        # UBE has no dedicated Lorcana collection, so this tracks one
-        # specific product directly. Add more the same way if you find
-        # other UBE Lorcana product URLs (use .../products/HANDLE.json).
         "products_json": "https://ubecard.com/products/disney-lorcana-set-8-reign-of-jafar-booster.json",
     },
     # Add more Canadian Shopify-based stores here, same shape as above.
 ]
 
-# Only notify for products that look like sealed product (boxes, packs, sets,
-# bundles, etc). This is a safety net even for the "sealed-only" collections
-# above, in case a store's feed still mixes in singles, accessories, etc.
-SEALED_KEYWORDS = [
-    "booster box", "booster pack", "booster bundle", "boosters",
-    "starter deck", "challenge deck", "deck box",
-    "gift set", "gift box", "collection starter", "collector's set", "collector set",
-    "trove", "bundle", "blister", "tin", "display", "case",
-    "two-player", "gateway", "quest", "fat pack", "value pack",
-]
 
 
 def is_sealed_product(title: str) -> bool:
