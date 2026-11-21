@@ -324,7 +324,7 @@
   "Hobbiesville (Lorcana)::Disney Lorcana: Attack of the Vine! - Booster Pack::Default Title": false,
   "Hobbiesville (Lorcana)::Disney Lorcana: Quest of Wonders::Default Title": false,
   "Hobbiesville (Lorcana)::Disney Lorcana: Into the Inkdark - Trove (Pre Order)::Default Title": false,
-  "Hobbiesville (Lorcana)::Disney Lorcana: Beast Gift Set (Pre Order)::Default Title": false,
+  "Hobbiesville (Lorcana)::Disney Lorcana: Beast Gift Set::Default Title": false,
   "Hobbiesville (Lorcana)::Disney Lorcana: Into the Inkdark - Booster Box (Pre Order)::Default Title": false,
   "Hobbiesville (Lorcana)::Disney Lorcana: Wilds Unknown - Booster Pack::Default Title": false,
   "Hobbiesville (Lorcana)::Disney Lorcana: Rapunzel Collection Starter Set::Default Title": false,
@@ -636,7 +636,7 @@
   "Infinity Cards (Lorcana)::Lorcana - Hyperia City - Booster Pack::Default Title": true,
   "Infinity Cards (Riftbound)::Riftbound - Vendetta - Booster Pack::Default Title": true,
   "Infinity Cards (Riftbound)::Riftbound - Vendetta - Booster Box::Default Title": true,
-  "Infinity Cards (Riftbound)::Riftbound - Origins - Booster Box::Default Title": false,
+  "Infinity Cards (Riftbound)::Riftbound - Origins - Booster Box::Default Title": true,
   "Infinity Cards (Riftbound)::Riftbound - Vendetta - Showdown Deck - Zed vs Shen::Default Title": true,
   "Infinity Cards (Riftbound)::Riftbound - Radiance - Evelynn vs Seraphine Showdown Deck::Default Title": true
 }
